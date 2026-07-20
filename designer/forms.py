@@ -20,7 +20,6 @@ class DetailsForm(forms.Form):
     font_custom_text = forms.CharField(
         label="Can't find your brand font? Tell us what it is", required=False
     )
-    style_guide_upload = forms.FileField(label='Upload Brand Style Here', required=False)
     comments = forms.CharField(label='Comments', widget=forms.Textarea, required=False)
 
     def __init__(self, *args, group=None, **kwargs):

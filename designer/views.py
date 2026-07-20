@@ -38,11 +38,6 @@ def details(request):
                 field_values=form.extract_field_values(cleaned),
             )
 
-            style_guide = cleaned.get('style_guide_upload')
-            if style_guide:
-                DesignRequestFile.objects.create(
-                    design_request=design_request, field_key='style_guide_upload', file=style_guide
-                )
             for field in group.field_schema:
                 if field['type'] == 'choice_or_upload':
                     upload = cleaned.get(f"{field['key']}_upload")
