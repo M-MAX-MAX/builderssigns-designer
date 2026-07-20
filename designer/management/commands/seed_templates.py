@@ -47,7 +47,7 @@ GROUPS = [
                 'type': 'choice',
                 'required': False,
                 'choices': ['Master Builders', 'HIA'],
-                'note': "Have a different association? Upload it with your logo on the next step.",
+                'note': "Have a different association? Upload it along with your logo below.",
             },
         ],
         'templates': ['Full Centered', 'Full Left', 'Full Stacked', 'Full Banner'],

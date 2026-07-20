@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
 from . import emails
+from .emails import UPLOADER_URL
 from .forms import FONT_OPTIONS, DetailsForm
 from .models import DesignRequest, Template, TemplateGroup
 
@@ -36,10 +37,13 @@ def details(request):
                 comments=cleaned.get('comments', ''),
                 field_values=form.extract_field_values(cleaned),
             )
-
             emails.notify_admin_of_details(design_request)
             request.session['design_request_id'] = design_request.id
-            return redirect('designer:logo')
+
+            if request.POST.get('upload_choice') == 'later':
+                emails.notify_client_uploader_link(design_request)
+                return redirect('designer:upload_later')
+            return redirect(UPLOADER_URL)
     else:
         form = DetailsForm(group=group)
 
@@ -48,9 +52,9 @@ def details(request):
     })
 
 
-def logo(request):
+def upload_later(request):
     design_request_id = request.session.get('design_request_id')
     if not design_request_id:
         return redirect('designer:gallery')
     design_request = get_object_or_404(DesignRequest, id=design_request_id)
-    return render(request, 'designer/step3_logo.html', {'design_request': design_request})
+    return render(request, 'designer/upload_later.html', {'design_request': design_request})

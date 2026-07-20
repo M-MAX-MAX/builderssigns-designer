@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 
+UPLOADER_URL = "https://fproof.au/upload/builders-signs/"
+
 
 def _field_lines(design_request):
     lines = [
@@ -44,4 +46,20 @@ def notify_admin_of_details(design_request):
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[settings.ADMIN_NOTIFY_EMAIL],
+    ).send(fail_silently=False)
+
+
+def notify_client_uploader_link(design_request):
+    subject = "Your logo upload link — Builders Signs"
+    body = (
+        f"Hi,\n\nThanks for your banner design details (order {design_request.order_number}). "
+        "When you're ready, upload your logo (and anything else we'll need, like a different "
+        f"association logo) here:\n\n{UPLOADER_URL}\n\n"
+        "We'll have your design with you within 4 hours of receiving it.\n\nThanks,\nBuilders Signs"
+    )
+    EmailMessage(
+        subject=subject,
+        body=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[design_request.client_email],
     ).send(fail_silently=False)

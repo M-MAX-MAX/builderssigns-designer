@@ -1,0 +1,13 @@
+{% extends "designer/base.html" %}
+{% block content %}
+  <h1>You're All Set{% if design_request %}, Order {{ design_request.order_number }}{% endif %}</h1>
+
+  <p>
+    We've emailed you the logo uploader link — use it whenever you're ready. Your design will be
+    with you within <strong>4 hours</strong> of us receiving your logo.
+  </p>
+  <p>
+    Once you approve the proof we send you, production begins — we'll include an estimated
+    production and delivery timeline with that proof.
+  </p>
+{% endblock %}
