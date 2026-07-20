@@ -1,0 +1,102 @@
+{% extends "designer/base.html" %}
+{% load designer_extras %}
+{% block content %}
+  <h1>Edit the {{ template.name }} Template</h1>
+  <div class="steps">
+    <span class="done">01</span>
+    <span class="active">02</span>
+    <span>03</span>
+    <span>04</span>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <fieldset>
+      <div class="field">
+        {{ form.client_email.label_tag }}
+        {{ form.client_email }}
+        {{ form.client_email.errors }}
+      </div>
+      <div class="field">
+        {{ form.order_number.label_tag }}
+        {{ form.order_number }}
+        {{ form.order_number.errors }}
+      </div>
+    </fieldset>
+
+    {% for field in template.group.field_schema %}
+      <fieldset>
+        {% if field.type == 'social' %}
+          <div class="field">
+            {% with handle_field=form|get_item:field.key %}
+              {{ handle_field.label_tag }}
+              {{ handle_field }}
+              {{ handle_field.errors }}
+            {% endwith %}
+          </div>
+          <div class="field checkbox-row">
+            {% with platforms_key=field.key|add:'_platforms' %}
+              {% with platforms_field=form|get_item:platforms_key %}
+                {{ platforms_field }}
+                {{ platforms_field.errors }}
+              {% endwith %}
+            {% endwith %}
+          </div>
+        {% elif field.type == 'choice_or_upload' %}
+          <div class="field checkbox-row">
+            {% with choice_field=form|get_item:field.key %}
+              <label>Select your {{ field.label }}</label>
+              {{ choice_field }}
+              {{ choice_field.errors }}
+            {% endwith %}
+          </div>
+          <p class="help">— OR —</p>
+          <div class="field">
+            {% with upload_key=field.key|add:'_upload' %}
+              {% with upload_field=form|get_item:upload_key %}
+                {{ upload_field.label_tag }}
+                {{ upload_field }}
+                {{ upload_field.errors }}
+              {% endwith %}
+            {% endwith %}
+          </div>
+        {% else %}
+          <div class="field">
+            {% with bound_field=form|get_item:field.key %}
+              {{ bound_field.label_tag }}
+              {{ bound_field }}
+              {{ bound_field.errors }}
+            {% endwith %}
+          </div>
+        {% endif %}
+      </fieldset>
+    {% endfor %}
+
+    <fieldset>
+      <div class="field">
+        {{ form.background_colour.label_tag }}
+        {{ form.background_colour }}
+      </div>
+      <div class="field">
+        {{ form.font_choice.label_tag }}
+        {{ form.font_choice }}
+      </div>
+      <div class="field">
+        {{ form.font_custom_text.label_tag }}
+        {{ form.font_custom_text }}
+      </div>
+      <div class="field">
+        {{ form.style_guide_upload.label_tag }}
+        <p class="help">SVG or PNG</p>
+        {{ form.style_guide_upload }}
+      </div>
+      <div class="field">
+        {{ form.comments.label_tag }}
+        {{ form.comments }}
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn">Proceed to Logo Upload</button>
+  </form>
+{% endblock %}

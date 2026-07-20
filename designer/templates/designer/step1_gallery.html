@@ -1,0 +1,45 @@
+{% extends "designer/base.html" %}
+{% block content %}
+  <h1>Choose Your Banner Template</h1>
+  <div class="banner">
+    These are starting points only — background colour and fonts can all be changed to match
+    your brand on the next step, and templates aren't limited to the colours shown here.
+  </div>
+
+  {% for group in groups %}
+    <div class="gallery-group">
+      <h2>{{ group.name }}</h2>
+      <div class="gallery-grid">
+        {% for template in group.templates.all %}
+          {% if template.is_active %}
+            <div class="tile">
+              <img src="{{ template.svg_asset.url }}" alt="{{ template.name }}" data-zoom="{{ template.svg_asset.url }}">
+              <div class="tile-footer">
+                <button type="button" class="zoom-btn" data-zoom="{{ template.svg_asset.url }}" title="Zoom">&#128269;</button>
+                <a class="btn use-btn" href="{% url 'designer:select_template' template.slug %}">Use This Template</a>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">&times;</button>
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <script>
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    document.querySelectorAll('[data-zoom]').forEach(el => {
+      el.addEventListener('click', () => {
+        lightboxImg.src = el.getAttribute('data-zoom');
+        lightbox.classList.add('open');
+      });
+    });
+    document.getElementById('lightbox-close').addEventListener('click', () => lightbox.classList.remove('open'));
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('open'); });
+  </script>
+{% endblock %}

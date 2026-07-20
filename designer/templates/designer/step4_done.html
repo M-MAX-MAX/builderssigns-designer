@@ -1,0 +1,16 @@
+{% extends "designer/base.html" %}
+{% block content %}
+  <h1>You're All Set{% if design_request %}, Order {{ design_request.order_number }}{% endif %}</h1>
+  <div class="steps">
+    <span class="done">01</span>
+    <span class="done">02</span>
+    <span class="done">03</span>
+    <span class="active">04</span>
+  </div>
+
+  <p>We've got everything we need to get started. Your design will be with you within <strong>4 hours</strong>.</p>
+  <p>
+    Once you approve the proof we send you, production begins — we'll include an estimated
+    production and delivery timeline with that proof.
+  </p>
+{% endblock %}
