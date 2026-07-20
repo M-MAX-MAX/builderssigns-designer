@@ -7,12 +7,7 @@
 {% endblock %}
 {% block content %}
   <h1>Edit the {{ template.name }} Template</h1>
-  <div class="steps">
-    <span class="done">01</span>
-    <span class="active">02</span>
-    <span>03</span>
-    <span>04</span>
-  </div>
+  {% include "designer/_steps.html" with current=2 %}
 
   <form method="post">
     {% csrf_token %}
@@ -72,7 +67,10 @@
     <fieldset>
       <div class="field">
         {{ form.background_colour.label_tag }}
-        {{ form.background_colour }}
+        <div class="colour-field">
+          {{ form.background_colour }}
+          <span class="colour-hex" data-colour-hex>{{ form.background_colour.value|default:'#000000' }}</span>
+        </div>
       </div>
       <div class="field">
         {{ form.font_choice.label_tag }}
@@ -104,6 +102,12 @@
   </form>
 
   <script>
+    const colourInput = document.querySelector('input[name="background_colour"]');
+    const colourHex = document.querySelector('[data-colour-hex]');
+    if (colourInput && colourHex) {
+      colourInput.addEventListener('input', () => { colourHex.textContent = colourInput.value; });
+    }
+
     document.querySelectorAll('[data-picker]').forEach(picker => {
       const toggle = picker.querySelector('[data-picker-toggle]');
       const select = picker.querySelector('select');
@@ -130,7 +134,18 @@
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'font-picker-option';
-        btn.textContent = opt.textContent;
+
+        const nameLine = document.createElement('span');
+        nameLine.textContent = opt.textContent;
+        btn.appendChild(nameLine);
+
+        if (opt.dataset.family) {
+          const capsLine = document.createElement('span');
+          capsLine.className = 'font-caps';
+          capsLine.textContent = opt.textContent;
+          btn.appendChild(capsLine);
+        }
+
         applyFont(btn, opt);
         btn.addEventListener('click', () => {
           select.value = opt.value;

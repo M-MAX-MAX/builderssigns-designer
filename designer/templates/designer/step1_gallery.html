@@ -1,6 +1,7 @@
 {% extends "designer/base.html" %}
 {% block content %}
   <h1>Choose Your Banner Template</h1>
+  {% include "designer/_steps.html" with current=1 %}
   <div class="banner">
     These are starting points only — background colour and fonts can all be changed to match
     your brand on the next step, and templates aren't limited to the colours shown here.

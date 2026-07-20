@@ -1,0 +1,5 @@
+<div class="steps">
+  <a href="{% url 'designer:gallery' %}" class="{% if current > 1 %}done{% elif current == 1 %}active{% endif %}">01</a>
+  <a href="{% url 'designer:details' %}" class="{% if current > 2 %}done{% elif current == 2 %}active{% endif %}">02</a>
+  <a href="{% url 'designer:logo' %}" class="{% if current == 3 %}active{% endif %}">03</a>
+</div>

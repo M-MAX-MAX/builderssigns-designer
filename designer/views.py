@@ -54,11 +54,3 @@ def logo(request):
         return redirect('designer:gallery')
     design_request = get_object_or_404(DesignRequest, id=design_request_id)
     return render(request, 'designer/step3_logo.html', {'design_request': design_request})
-
-
-def done(request):
-    design_request_id = request.session.get('design_request_id')
-    design_request = DesignRequest.objects.filter(id=design_request_id).first()
-    request.session.pop('template_id', None)
-    request.session.pop('design_request_id', None)
-    return render(request, 'designer/step4_done.html', {'design_request': design_request})

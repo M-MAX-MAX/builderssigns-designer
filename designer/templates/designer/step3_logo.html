@@ -1,17 +1,11 @@
 {% extends "designer/base.html" %}
 {% block content %}
-  <h1>Upload Your Logo</h1>
-  <div class="steps">
-    <span class="done">01</span>
-    <span class="done">02</span>
-    <span class="active">03</span>
-    <span>04</span>
-  </div>
+  <h1>Upload Your Logo{% if design_request %}, Order {{ design_request.order_number }}{% endif %}</h1>
+  {% include "designer/_steps.html" with current=3 %}
 
   <p>
     Upload your logo — and anything else we'll need, like a different association logo if yours
-    wasn't in the list — using our uploader. Have your order number ({{ design_request.order_number }})
-    and email handy.
+    wasn't in the list — using our uploader. Have your order number and email handy.
   </p>
 
   <p>
@@ -20,7 +14,9 @@
     </a>
   </p>
 
-  <p class="help">Uploaded already, or doing it later? Either way, you're all set — continue below.</p>
-
-  <a class="btn" href="{% url 'designer:done' %}" style="background:#eee;">Continue</a>
+  <p>We've got everything else we need to get started. Your design will be with you within <strong>4 hours</strong>.</p>
+  <p>
+    Once you approve the proof we send you, production begins — we'll include an estimated
+    production and delivery timeline with that proof.
+  </p>
 {% endblock %}
