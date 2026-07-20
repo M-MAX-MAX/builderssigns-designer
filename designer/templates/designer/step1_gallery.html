@@ -14,6 +14,7 @@
           {% if template.is_active %}
             <div class="tile">
               <img src="{{ template.svg_asset.url }}" alt="{{ template.name }}" data-zoom="{{ template.svg_asset.url }}">
+              <p class="tile-label">{{ template.name }}</p>
               <div class="tile-footer">
                 <button type="button" class="zoom-btn" data-zoom="{{ template.svg_asset.url }}" title="Zoom">&#128269;</button>
                 <a class="btn use-btn" href="{% url 'designer:select_template' template.slug %}">Use This Template</a>

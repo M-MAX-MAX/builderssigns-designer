@@ -6,7 +6,6 @@ from designer.models import Template, TemplateGroup
 PLACEHOLDER_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250">
   <rect width="400" height="250" fill="#111111"/>
   <text x="30" y="140" fill="#ffffff" font-family="sans-serif" font-size="26" font-weight="bold">Builders Signs</text>
-  <text x="30" y="230" fill="#999999" font-family="sans-serif" font-size="12">{label}</text>
 </svg>"""
 
 GROUPS = [
@@ -73,8 +72,7 @@ class Command(BaseCommand):
                     defaults={'group': group, 'name': label, 'order': i},
                 )
                 if not template.svg_asset:
-                    svg_content = PLACEHOLDER_SVG.format(label=label)
-                    template.svg_asset.save(f'{slug}.svg', ContentFile(svg_content), save=True)
+                    template.svg_asset.save(f'{slug}.svg', ContentFile(PLACEHOLDER_SVG), save=True)
                 self.stdout.write(f"  - {template.name}")
 
         self.stdout.write(self.style.SUCCESS('Seed complete.'))
