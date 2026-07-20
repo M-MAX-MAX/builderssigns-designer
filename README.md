@@ -67,8 +67,6 @@ Target: `design.builderssigns.com.au`, Python 3.9.23 via cPanel's Setup Python A
 
 8. **Restart** the app from Setup Python App.
 
-9. **Cron job** — Advanced → Cron Jobs → Add New Cron Job, daily, running:
-   ```
-   /path/to/virtualenv/bin/python /path/to/app/manage.py check_lapsed_requests
-   ```
-   (exact paths shown in Setup Python App's virtualenv info).
+Deferred logos are tracked manually for now: the admin list shows `logo_deferred_at` for each
+request, and there's a "Mark logo received" bulk action once you've matched an upload from the
+standalone uploader to its order.

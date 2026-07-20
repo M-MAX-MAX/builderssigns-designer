@@ -42,8 +42,6 @@ class DesignRequest(models.Model):
         DETAILS_SUBMITTED = 'details_submitted', 'Details submitted'
         LOGO_UPLOADED = 'logo_uploaded', 'Logo uploaded'
         LOGO_DEFERRED = 'logo_deferred', 'Logo deferred'
-        REMINDED = 'reminded', 'Client reminded'
-        ESCALATED = 'escalated', 'Admin escalated'
         COMPLETE = 'complete', 'Complete'
 
     template = models.ForeignKey(Template, on_delete=models.PROTECT, related_name='design_requests')
@@ -61,8 +59,6 @@ class DesignRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     logo_deferred_at = models.DateTimeField(blank=True, null=True)
-    reminder_sent_at = models.DateTimeField(blank=True, null=True)
-    escalated_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']

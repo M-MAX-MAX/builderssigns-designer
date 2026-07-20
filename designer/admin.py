@@ -24,7 +24,7 @@ class TemplateAdmin(admin.ModelAdmin):
 
 @admin.register(DesignRequest)
 class DesignRequestAdmin(admin.ModelAdmin):
-    list_display = ('order_number', 'client_email', 'template', 'status', 'created_at')
+    list_display = ('order_number', 'client_email', 'template', 'status', 'logo_deferred_at', 'created_at')
     list_filter = ('status', 'template__group')
     search_fields = ('order_number', 'client_email')
     readonly_fields = ('created_at', 'updated_at')

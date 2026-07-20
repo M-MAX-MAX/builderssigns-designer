@@ -62,32 +62,3 @@ def notify_admin_of_logo(design_request):
     subject = f"Logo received — order {design_request.order_number}"
     body = "\n".join(_field_lines(design_request) + ["Logo file attached."])
     _send_with_attachments(subject, body, design_request, include_files=False, include_logo=True)
-
-
-def notify_client_reminder(design_request):
-    subject = "Reminder: we still need your logo — Builders Signs"
-    body = (
-        f"Hi,\n\nWe're ready to start on your banner design (order {design_request.order_number}) "
-        "but we're still waiting on your logo. Please upload it here:\n"
-        "https://fproof.au/upload/builders-signs/\n\n"
-        "Thanks,\nBuilders Signs"
-    )
-    EmailMessage(
-        subject=subject,
-        body=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[design_request.client_email],
-    ).send(fail_silently=False)
-
-
-def notify_admin_escalation(design_request):
-    subject = f"Lapsed design request — order {design_request.order_number}"
-    body = "\n".join(_field_lines(design_request) + [
-        "", "Client has not uploaded a logo despite a reminder. Manual follow-up may be required.",
-    ])
-    EmailMessage(
-        subject=subject,
-        body=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[settings.ADMIN_NOTIFY_EMAIL],
-    ).send(fail_silently=False)
