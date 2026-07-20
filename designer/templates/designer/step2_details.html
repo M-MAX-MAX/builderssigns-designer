@@ -1,5 +1,10 @@
 {% extends "designer/base.html" %}
 {% load designer_extras %}
+{% block extra_head %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@700&family=Oswald:wght@700&family=Roboto:wght@700&family=Open+Sans:wght@700&family=Lato:wght@700&family=Raleway:wght@700&family=Playfair+Display:wght@700&family=Anton&family=Bebas+Neue&display=swap">
+{% endblock %}
 {% block content %}
   <h1>Edit the {{ template.name }} Template</h1>
   <div class="steps">
@@ -71,7 +76,19 @@
       </div>
       <div class="field">
         {{ form.font_choice.label_tag }}
-        {{ form.font_choice }}
+        <div class="font-picker" data-picker>
+          <button type="button" class="font-picker-toggle" data-picker-toggle>Select a font</button>
+          <select name="font_choice" id="id_font_choice" hidden>
+            <option value="">— Select —</option>
+            {% for f in font_options %}
+              <option value="{{ f.value }}" data-family="{{ f.family }}" data-weight="{{ f.weight }}"
+                {% if form.font_choice.value == f.value %}selected{% endif %}>{{ f.label }}</option>
+            {% endfor %}
+            <option value="other" {% if form.font_choice.value == 'other' %}selected{% endif %}>Other — tell us below</option>
+          </select>
+          <div class="font-picker-list" data-picker-list hidden></div>
+        </div>
+        {{ form.font_choice.errors }}
       </div>
       <div class="field">
         {{ form.font_custom_text.label_tag }}
@@ -85,4 +102,50 @@
 
     <button type="submit" class="btn">Continue</button>
   </form>
+
+  <script>
+    document.querySelectorAll('[data-picker]').forEach(picker => {
+      const toggle = picker.querySelector('[data-picker-toggle]');
+      const select = picker.querySelector('select');
+      const list = picker.querySelector('[data-picker-list]');
+
+      function applyFont(el, opt) {
+        if (opt && opt.dataset.family) {
+          el.style.fontFamily = `'${opt.dataset.family}', sans-serif`;
+          el.style.fontWeight = opt.dataset.weight || '400';
+        } else {
+          el.style.fontFamily = '';
+          el.style.fontWeight = '';
+        }
+      }
+
+      function updateToggle() {
+        const selected = select.options[select.selectedIndex];
+        toggle.textContent = (selected && selected.value) ? selected.textContent : 'Select a font';
+        applyFont(toggle, selected && selected.value ? selected : null);
+      }
+
+      Array.from(select.options).forEach(opt => {
+        if (!opt.value) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'font-picker-option';
+        btn.textContent = opt.textContent;
+        applyFont(btn, opt);
+        btn.addEventListener('click', () => {
+          select.value = opt.value;
+          updateToggle();
+          list.hidden = true;
+        });
+        list.appendChild(btn);
+      });
+
+      toggle.addEventListener('click', () => { list.hidden = !list.hidden; });
+      document.addEventListener('click', (e) => {
+        if (!picker.contains(e.target)) list.hidden = true;
+      });
+
+      updateToggle();
+    });
+  </script>
 {% endblock %}

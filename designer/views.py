@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
 from . import emails
-from .forms import DetailsForm
+from .forms import FONT_OPTIONS, DetailsForm
 from .models import DesignRequest, Template, TemplateGroup
 
 
@@ -43,7 +43,9 @@ def details(request):
     else:
         form = DetailsForm(group=group)
 
-    return render(request, 'designer/step2_details.html', {'form': form, 'template': template})
+    return render(request, 'designer/step2_details.html', {
+        'form': form, 'template': template, 'font_options': FONT_OPTIONS,
+    })
 
 
 def logo(request):

@@ -43,7 +43,24 @@
     .lightbox.open { display: flex; }
     .lightbox img { max-width: 90vw; max-height: 90vh; background: #fff; }
     .lightbox-close { position: absolute; top: 20px; right: 30px; color: #fff; font-size: 28px; cursor: pointer; background: none; border: none; }
+
+    .font-picker { position: relative; }
+    .font-picker-toggle {
+      width: 100%; text-align: left; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px;
+      background: #fff; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    }
+    .font-picker-toggle::after { content: "▾"; color: #888; font-size: 12px; margin-left: 8px; }
+    .font-picker-list {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid #ccc;
+      border-radius: 4px; max-height: 260px; overflow-y: auto; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+    .font-picker-option {
+      display: block; width: 100%; text-align: left; padding: 10px 12px; border: none; background: none;
+      cursor: pointer; font-size: 16px;
+    }
+    .font-picker-option:hover, .font-picker-option:focus { background: #f5f5f5; }
   </style>
+  {% block extra_head %}{% endblock %}
 </head>
 <body>
   <header>

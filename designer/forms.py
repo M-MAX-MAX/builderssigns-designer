@@ -1,10 +1,21 @@
 from django import forms
 
-FONT_CHOICES = [
-    ('inter', 'Inter (Default)'),
-    ('your_company', 'Your Company'),
-    ('other', "Other — tell us below"),
+# Bold-weight Google Fonts offered on step 2. Anton and Bebas Neue only ship
+# one (already-heavy) weight on Google Fonts, so they're loaded at 400
+# rather than a synthetic/faked 700.
+FONT_OPTIONS = [
+    {'value': 'montserrat', 'label': 'Montserrat', 'family': 'Montserrat', 'weight': 700},
+    {'value': 'poppins', 'label': 'Poppins', 'family': 'Poppins', 'weight': 700},
+    {'value': 'oswald', 'label': 'Oswald', 'family': 'Oswald', 'weight': 700},
+    {'value': 'roboto', 'label': 'Roboto', 'family': 'Roboto', 'weight': 700},
+    {'value': 'open_sans', 'label': 'Open Sans', 'family': 'Open Sans', 'weight': 700},
+    {'value': 'lato', 'label': 'Lato', 'family': 'Lato', 'weight': 700},
+    {'value': 'raleway', 'label': 'Raleway', 'family': 'Raleway', 'weight': 700},
+    {'value': 'playfair_display', 'label': 'Playfair Display', 'family': 'Playfair Display', 'weight': 700},
+    {'value': 'anton', 'label': 'Anton', 'family': 'Anton', 'weight': 400},
+    {'value': 'bebas_neue', 'label': 'Bebas Neue', 'family': 'Bebas Neue', 'weight': 400},
 ]
+FONT_CHOICES = [(f['value'], f['label']) for f in FONT_OPTIONS] + [('other', 'Other — tell us below')]
 
 
 class DetailsForm(forms.Form):
