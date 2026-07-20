@@ -1,9 +1,8 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 
 from . import emails
-from .forms import DetailsForm, LogoDecisionForm
-from .models import DesignRequest, DesignRequestFile, Template, TemplateGroup
+from .forms import DetailsForm
+from .models import DesignRequest, Template, TemplateGroup
 
 
 def template_gallery(request):
@@ -26,7 +25,7 @@ def details(request):
     group = template.group
 
     if request.method == 'POST':
-        form = DetailsForm(request.POST, request.FILES, group=group)
+        form = DetailsForm(request.POST, group=group)
         if form.is_valid():
             cleaned = form.cleaned_data
             design_request = DesignRequest.objects.create(
@@ -37,14 +36,6 @@ def details(request):
                 comments=cleaned.get('comments', ''),
                 field_values=form.extract_field_values(cleaned),
             )
-
-            for field in group.field_schema:
-                if field['type'] == 'choice_or_upload':
-                    upload = cleaned.get(f"{field['key']}_upload")
-                    if upload:
-                        DesignRequestFile.objects.create(
-                            design_request=design_request, field_key=field['key'], file=upload
-                        )
 
             emails.notify_admin_of_details(design_request)
             request.session['design_request_id'] = design_request.id
@@ -60,24 +51,7 @@ def logo(request):
     if not design_request_id:
         return redirect('designer:gallery')
     design_request = get_object_or_404(DesignRequest, id=design_request_id)
-
-    if request.method == 'POST':
-        form = LogoDecisionForm(request.POST, request.FILES)
-        if form.is_valid():
-            if form.cleaned_data['decision'] == LogoDecisionForm.NOW:
-                design_request.logo_file = form.cleaned_data['logo_file']
-                design_request.status = DesignRequest.Status.LOGO_UPLOADED
-                design_request.save()
-                emails.notify_admin_of_logo(design_request)
-            else:
-                design_request.status = DesignRequest.Status.LOGO_DEFERRED
-                design_request.logo_deferred_at = timezone.now()
-                design_request.save()
-            return redirect('designer:done')
-    else:
-        form = LogoDecisionForm()
-
-    return render(request, 'designer/step3_logo.html', {'form': form, 'design_request': design_request})
+    return render(request, 'designer/step3_logo.html', {'design_request': design_request})
 
 
 def done(request):

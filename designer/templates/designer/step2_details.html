@@ -9,7 +9,7 @@
     <span>04</span>
   </div>
 
-  <form method="post" enctype="multipart/form-data">
+  <form method="post">
     {% csrf_token %}
 
     <fieldset>
@@ -43,23 +43,14 @@
               {% endwith %}
             {% endwith %}
           </div>
-        {% elif field.type == 'choice_or_upload' %}
+        {% elif field.type == 'choice' %}
           <div class="field checkbox-row">
             {% with choice_field=form|get_item:field.key %}
               <label>Select your {{ field.label }}</label>
               {{ choice_field }}
               {{ choice_field.errors }}
             {% endwith %}
-          </div>
-          <p class="help">— OR —</p>
-          <div class="field">
-            {% with upload_key=field.key|add:'_upload' %}
-              {% with upload_field=form|get_item:upload_key %}
-                {{ upload_field.label_tag }}
-                {{ upload_field }}
-                {{ upload_field.errors }}
-              {% endwith %}
-            {% endwith %}
+            {% if field.note %}<p class="help">{{ field.note }}</p>{% endif %}
           </div>
         {% else %}
           <div class="field">
@@ -92,6 +83,6 @@
       </div>
     </fieldset>
 
-    <button type="submit" class="btn">Proceed to Logo Upload</button>
+    <button type="submit" class="btn">Continue</button>
   </form>
 {% endblock %}

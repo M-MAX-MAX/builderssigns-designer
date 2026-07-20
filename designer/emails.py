@@ -22,9 +22,10 @@ def _field_lines(design_request):
         if field['type'] == 'social' and val:
             platforms = ', '.join(val.get('platforms', []))
             lines.append(f"{field['label']}: {val.get('handle', '')} ({platforms})")
-        elif field['type'] == 'choice_or_upload' and val:
+        elif field['type'] == 'choice' and val:
             choices = ', '.join(val.get('choices', []))
-            lines.append(f"{field['label']}: {choices or '(see attached upload)'}")
+            if choices:
+                lines.append(f"{field['label']}: {choices}")
         elif val:
             lines.append(f"{field['label']}: {val}")
 
@@ -33,32 +34,14 @@ def _field_lines(design_request):
     return lines
 
 
-def _send_with_attachments(subject, body, design_request, include_files=True, include_logo=False):
-    email = EmailMessage(
+def notify_admin_of_details(design_request):
+    subject = f"New banner design request — order {design_request.order_number}"
+    body = "\n".join(_field_lines(design_request) + [
+        "", "Logo (and any extra files) will come through the standalone uploader separately.",
+    ])
+    EmailMessage(
         subject=subject,
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[settings.ADMIN_NOTIFY_EMAIL],
-    )
-    if include_files:
-        for f in design_request.files.all():
-            f.file.open('rb')
-            email.attach(f.file.name.split('/')[-1], f.file.read(), None)
-            f.file.close()
-    if include_logo and design_request.logo_file:
-        design_request.logo_file.open('rb')
-        email.attach(design_request.logo_file.name.split('/')[-1], design_request.logo_file.read(), None)
-        design_request.logo_file.close()
-    email.send(fail_silently=False)
-
-
-def notify_admin_of_details(design_request):
-    subject = f"New banner design request — order {design_request.order_number}"
-    body = "\n".join(_field_lines(design_request))
-    _send_with_attachments(subject, body, design_request, include_files=True)
-
-
-def notify_admin_of_logo(design_request):
-    subject = f"Logo received — order {design_request.order_number}"
-    body = "\n".join(_field_lines(design_request) + ["Logo file attached."])
-    _send_with_attachments(subject, body, design_request, include_files=False, include_logo=True)
+    ).send(fail_silently=False)

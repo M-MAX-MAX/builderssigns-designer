@@ -11,15 +11,15 @@ class TemplateInline(admin.TabularInline):
     extra = 1
 
 
-class DeferredAgeFilter(admin.SimpleListFilter):
-    title = 'deferred logo age'
-    parameter_name = 'deferred_age'
+class AwaitingLogoAgeFilter(admin.SimpleListFilter):
+    title = 'awaiting logo age'
+    parameter_name = 'awaiting_age'
 
     def lookups(self, request, model_admin):
         return [
-            ('1', 'Deferred over 1 day'),
-            ('3', 'Deferred over 3 days'),
-            ('7', 'Deferred over 7 days'),
+            ('1', 'Submitted over 1 day ago'),
+            ('3', 'Submitted over 3 days ago'),
+            ('7', 'Submitted over 7 days ago'),
         ]
 
     def queryset(self, request, queryset):
@@ -27,7 +27,7 @@ class DeferredAgeFilter(admin.SimpleListFilter):
             return queryset
         cutoff = timezone.now() - timedelta(days=int(self.value()))
         return queryset.filter(
-            status=DesignRequest.Status.LOGO_DEFERRED, logo_deferred_at__lte=cutoff
+            status=DesignRequest.Status.DETAILS_SUBMITTED, created_at__lte=cutoff
         )
 
 
@@ -47,8 +47,8 @@ class TemplateAdmin(admin.ModelAdmin):
 
 @admin.register(DesignRequest)
 class DesignRequestAdmin(admin.ModelAdmin):
-    list_display = ('order_number', 'client_email', 'template', 'status', 'logo_deferred_at', 'created_at')
-    list_filter = ('status', 'template__group', DeferredAgeFilter)
+    list_display = ('order_number', 'client_email', 'template', 'status', 'created_at')
+    list_filter = ('status', 'template__group', AwaitingLogoAgeFilter)
     search_fields = ('order_number', 'client_email')
     readonly_fields = ('created_at', 'updated_at')
     actions = ['mark_logo_received']

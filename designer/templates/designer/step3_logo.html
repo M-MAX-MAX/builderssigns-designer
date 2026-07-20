@@ -8,24 +8,19 @@
     <span>04</span>
   </div>
 
-  <p class="help">
-    Away from your logo file right now? That's fine — choose "upload it later" and you can send it
-    through any time using our uploader.
+  <p>
+    Upload your logo — and anything else we'll need, like a different association logo if yours
+    wasn't in the list — using our uploader. Have your order number ({{ design_request.order_number }})
+    and email handy.
   </p>
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <fieldset class="checkbox-row" style="display:block;">
-      {% for radio in form.decision %}
-        <label style="display:block; margin-bottom: 8px;">{{ radio.tag }} {{ radio.choice_label }}</label>
-      {% endfor %}
-      {{ form.decision.errors }}
-    </fieldset>
-    <div class="field">
-      {{ form.logo_file.label_tag }}
-      {{ form.logo_file }}
-      {{ form.logo_file.errors }}
-    </div>
-    <button type="submit" class="btn">Continue</button>
-  </form>
+  <p>
+    <a class="btn" href="https://fproof.au/upload/builders-signs/" target="_blank" rel="noopener">
+      Open the Uploader
+    </a>
+  </p>
+
+  <p class="help">Uploaded already, or doing it later? Either way, you're all set — continue below.</p>
+
+  <a class="btn" href="{% url 'designer:done' %}" style="background:#eee;">Continue</a>
 {% endblock %}

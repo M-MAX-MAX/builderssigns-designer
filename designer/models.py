@@ -12,7 +12,7 @@ class TemplateGroup(models.Model):
     # Group-specific extra fields rendered on step 2, on top of the universal
     # fields (email, order number, colour, font, comments) every group gets.
     # e.g. [{"key": "phone", "label": "Phone Number", "type": "text", "required": True}, ...]
-    # Supported types: text, url, social, choice_or_upload
+    # Supported types: text, url, social, choice
     field_schema = models.JSONField(default=list, blank=True)
 
     class Meta:
@@ -41,7 +41,6 @@ class DesignRequest(models.Model):
     class Status(models.TextChoices):
         DETAILS_SUBMITTED = 'details_submitted', 'Details submitted'
         LOGO_UPLOADED = 'logo_uploaded', 'Logo uploaded'
-        LOGO_DEFERRED = 'logo_deferred', 'Logo deferred'
         COMPLETE = 'complete', 'Complete'
 
     template = models.ForeignKey(Template, on_delete=models.PROTECT, related_name='design_requests')
@@ -53,29 +52,17 @@ class DesignRequest(models.Model):
     background_colour = models.CharField(max_length=20, blank=True)
     comments = models.TextField(blank=True)
 
+    # Logos (and any extra files, e.g. a custom association logo) are
+    # uploaded through the separate Dropbox-backed uploader, not stored
+    # here — status is set manually via the "Mark logo received" admin
+    # action once the file shows up there.
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DETAILS_SUBMITTED)
-    logo_file = models.FileField(upload_to='logos/', blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    logo_deferred_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.order_number} — {self.client_email} ({self.template.name})"
-
-
-class DesignRequestFile(models.Model):
-    """Ancillary uploads tied to a request (association logo, brand style
-    guide, etc.) — kept generic so new upload-type fields on future groups
-    don't need a model change."""
-
-    design_request = models.ForeignKey(DesignRequest, on_delete=models.CASCADE, related_name='files')
-    field_key = models.CharField(max_length=100)
-    file = models.FileField(upload_to='request_files/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'{self.field_key} for {self.design_request_id}'

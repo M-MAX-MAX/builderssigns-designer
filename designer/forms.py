@@ -47,35 +47,17 @@ class DetailsForm(forms.Form):
                     required=required,
                 )
 
-            elif field['type'] == 'choice_or_upload':
+            elif field['type'] == 'choice':
                 self.fields[key] = forms.MultipleChoiceField(
                     label=label,
                     choices=[(c, c) for c in field.get('choices', [])],
                     widget=forms.CheckboxSelectMultiple,
-                    required=False,
+                    required=required,
                 )
-                self.fields[f'{key}_upload'] = forms.FileField(
-                    label=f'Or upload your own {label.lower()} logo', required=False
-                )
-
-    def clean(self):
-        cleaned = super().clean()
-        if not self.group:
-            return cleaned
-
-        # choice_or_upload fields: require one of the two sub-fields, not both empty
-        for field in self.group.field_schema:
-            if field['type'] == 'choice_or_upload':
-                key = field['key']
-                if not cleaned.get(key) and not cleaned.get(f'{key}_upload'):
-                    if field.get('required'):
-                        self.add_error(key, 'Choose an option or upload your own.')
-        return cleaned
 
     def extract_field_values(self, cleaned_data):
         """Pull just the dynamic (group-specific) answers into a plain dict
-        for storage on DesignRequest.field_values — files are handled by the
-        view separately since JSONField can't hold them."""
+        for storage on DesignRequest.field_values."""
         values = {}
         for field in self.group.field_schema if self.group else []:
             key = field['key']
@@ -84,25 +66,10 @@ class DetailsForm(forms.Form):
                     'handle': cleaned_data.get(key, ''),
                     'platforms': cleaned_data.get(f'{key}_platforms', []),
                 }
-            elif field['type'] == 'choice_or_upload':
+            elif field['type'] == 'choice':
                 values[key] = {'choices': cleaned_data.get(key, [])}
             else:
                 values[key] = cleaned_data.get(key, '')
         values['font_choice'] = cleaned_data.get('font_choice', '')
         values['font_custom_text'] = cleaned_data.get('font_custom_text', '')
         return values
-
-
-class LogoDecisionForm(forms.Form):
-    NOW = 'now'
-    LATER = 'later'
-    CHOICES = [(NOW, 'Upload logo now'), (LATER, "I'll upload it later")]
-
-    decision = forms.ChoiceField(choices=CHOICES, widget=forms.RadioSelect)
-    logo_file = forms.FileField(required=False)
-
-    def clean(self):
-        cleaned = super().clean()
-        if cleaned.get('decision') == self.NOW and not cleaned.get('logo_file'):
-            self.add_error('logo_file', 'Please choose a logo file, or select "upload it later".')
-        return cleaned

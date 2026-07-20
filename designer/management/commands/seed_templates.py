@@ -44,9 +44,10 @@ GROUPS = [
             {
                 'key': 'association',
                 'label': 'Association',
-                'type': 'choice_or_upload',
-                'required': True,
+                'type': 'choice',
+                'required': False,
                 'choices': ['Master Builders', 'HIA'],
+                'note': "Have a different association? Upload it with your logo on the next step.",
             },
         ],
         'templates': ['Full Centered', 'Full Left', 'Full Stacked', 'Full Banner'],
