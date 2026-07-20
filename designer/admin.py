@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django.contrib import admin
+from django.utils import timezone
 
 from .models import DesignRequest, Template, TemplateGroup
 
@@ -6,6 +9,26 @@ from .models import DesignRequest, Template, TemplateGroup
 class TemplateInline(admin.TabularInline):
     model = Template
     extra = 1
+
+
+class DeferredAgeFilter(admin.SimpleListFilter):
+    title = 'deferred logo age'
+    parameter_name = 'deferred_age'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('1', 'Deferred over 1 day'),
+            ('3', 'Deferred over 3 days'),
+            ('7', 'Deferred over 7 days'),
+        ]
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+        cutoff = timezone.now() - timedelta(days=int(self.value()))
+        return queryset.filter(
+            status=DesignRequest.Status.LOGO_DEFERRED, logo_deferred_at__lte=cutoff
+        )
 
 
 @admin.register(TemplateGroup)
@@ -25,7 +48,7 @@ class TemplateAdmin(admin.ModelAdmin):
 @admin.register(DesignRequest)
 class DesignRequestAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'client_email', 'template', 'status', 'logo_deferred_at', 'created_at')
-    list_filter = ('status', 'template__group')
+    list_filter = ('status', 'template__group', DeferredAgeFilter)
     search_fields = ('order_number', 'client_email')
     readonly_fields = ('created_at', 'updated_at')
     actions = ['mark_logo_received']
