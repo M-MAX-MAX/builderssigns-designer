@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en-au">
 <head>
@@ -6,6 +7,14 @@
     <title>Upload Your Logo — Builders Signs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400 700;
+            font-display: swap;
+            src: url('{% static "designer/fonts/inter-var.woff2" %}') format('woff2');
+        }
+        body { font-family: 'Inter', sans-serif; }
         .progress-fill { transition: width 0.25s ease; }
     </style>
 </head>
