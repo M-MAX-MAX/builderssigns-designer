@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en-au">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Your Logo — Builders Signs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .progress-fill { transition: width 0.25s ease; }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+
+    <header class="border-b border-gray-100 px-6 py-4">
+        <div class="max-w-4xl mx-auto">
+            <span class="font-bold text-gray-900">Builders Signs — Design Your Banner</span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-10">
+
+        <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">Upload Your Logo</h1>
+        <p class="text-center text-sm text-gray-500 mb-8">
+            Order {{ design_request.order_number }} — {{ design_request.client_email }}
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+
+            <!-- Left column: dropzone + file list -->
+            <div class="flex flex-col gap-3">
+                <div id="dropzone"
+                     class="border-2 border-dashed border-gray-200 rounded-xl p-10 text-center cursor-pointer
+                            hover:border-gray-400 hover:bg-gray-50 transition-all outline-none"
+                     tabindex="0" role="button" aria-label="Upload files">
+                    <input type="file" id="file-input" multiple style="display:none;"
+                           accept=".pdf,.jpg,.jpeg,.png,.ai,.eps,.svg,.zip,.tif,.tiff,.psd">
+                    <div class="flex justify-center mb-3">
+                        <div class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-700"><strong class="font-semibold">Click to upload</strong> or drag and drop</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ allowed_types }} (max. {{ max_file_mb }}MB per file)</p>
+                </div>
+                <div id="file-list" class="flex flex-col gap-2"></div>
+            </div>
+
+            <!-- Right column: message + submit -->
+            <div class="flex flex-col gap-4">
+                <p class="text-sm text-gray-600">
+                    Upload your logo — and anything else we need, like a different association logo
+                    if yours wasn't in the list on the details page.
+                </p>
+
+                <div>
+                    <label for="f-message" class="block text-sm font-medium text-gray-700 mb-1">
+                        Notes about this upload <span class="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <textarea id="f-message" rows="5" placeholder="Anything we should know about these files..." maxlength="600"
+                              class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900
+                                     focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent placeholder-gray-400 resize-none"></textarea>
+                    <p class="text-xs text-gray-400 text-right mt-1"><span id="char-count">600</span> characters remaining</p>
+                </div>
+
+                <button id="submit-btn" type="button"
+                        class="w-full py-3.5 rounded-xl font-bold text-base transition-opacity disabled:opacity-50 disabled:cursor-not-allowed bg-yellow-400 text-gray-900">
+                    Submit
+                </button>
+
+                <div id="form-message" class="hidden"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    (function () {
+        'use strict';
+
+        const ICON_UPLOADING = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12l-3-3m0 0l-3 3m3-3v6m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+        </svg>`;
+        const ICON_DONE = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75z"/>
+        </svg>`;
+        const ICON_ERROR = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+        </svg>`;
+        const ICON_TRASH = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+        </svg>`;
+        const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>`;
+        const ICON_X_CIRCLE = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 flex-shrink-0">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>`;
+
+        let queue = [];
+        let uid = 0;
+
+        const ALLOWED = ['pdf','jpg','jpeg','png','ai','eps','svg','zip','tif','tiff','psd'];
+        const MAX_MB = {{ max_file_mb }};
+        const TOKEN = '{{ design_request.token }}';
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+        const messageEl = document.getElementById('f-message');
+        const charCount = document.getElementById('char-count');
+        const submitBtn = document.getElementById('submit-btn');
+        const formMsg = document.getElementById('form-message');
+
+        function getCsrf() {
+            const m = document.cookie.match(/csrftoken=([^;]+)/);
+            return m ? m[1] : '';
+        }
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+        });
+        fileInput.addEventListener('change', function () { addFiles(this.files); this.value = ''; });
+        dropzone.addEventListener('dragover', e => {
+            e.preventDefault(); dropzone.classList.add('border-gray-400', 'bg-gray-50');
+        });
+        dropzone.addEventListener('dragleave', e => {
+            if (!dropzone.contains(e.relatedTarget)) dropzone.classList.remove('border-gray-400', 'bg-gray-50');
+        });
+        dropzone.addEventListener('drop', e => {
+            e.preventDefault(); dropzone.classList.remove('border-gray-400', 'bg-gray-50');
+            addFiles(e.dataTransfer.files);
+        });
+        fileList.addEventListener('click', e => {
+            const btn = e.target.closest('[data-remove]');
+            if (btn) removeFile(btn.dataset.remove);
+        });
+        messageEl.addEventListener('input', () => {
+            const rem = 600 - messageEl.value.length;
+            charCount.textContent = rem;
+            charCount.className = rem < 50 ? 'text-red-500' : '';
+        });
+        submitBtn.addEventListener('click', handleSubmit);
+
+        function addFiles(files) {
+            Array.from(files).forEach(file => {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (!ALLOWED.includes(ext)) { addErrorCard(`${file.name}: .${ext} files are not accepted.`); return; }
+                if (file.size > MAX_MB * 1024 * 1024) { addErrorCard(`${file.name}: Exceeds the ${MAX_MB}MB size limit.`); return; }
+                const item = { id: `f${++uid}`, file, status: 'pending', filename: null, dropboxPath: null };
+                queue.push(item);
+                renderCard(item);
+                uploadFile(item).then(syncSubmit, syncSubmit);
+                syncSubmit();
+            });
+        }
+
+        function removeFile(id) {
+            queue = queue.filter(i => i.id !== id);
+            document.getElementById(`card-${id}`)?.remove();
+            syncSubmit();
+        }
+
+        function addErrorCard(message) {
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-600 text-sm';
+            div.innerHTML = ICON_X_CIRCLE + `<span>${esc(message)}</span>`;
+            fileList.insertBefore(div, fileList.firstChild);
+            setTimeout(() => div.remove(), 6000);
+        }
+
+        function renderCard(item) {
+            const card = document.createElement('div');
+            card.id = `card-${item.id}`;
+            card.className = 'flex items-start gap-3 border border-gray-200 rounded-xl p-3 bg-white';
+            card.innerHTML = `
+                <div class="icon-wrap w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center bg-amber-100 text-amber-600">${ICON_UPLOADING}</div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-sm font-medium text-gray-900 truncate">${esc(item.file.name)}</span>
+                        <button data-remove="${item.id}" class="text-gray-400 hover:text-gray-600 flex-shrink-0 p-0.5" aria-label="Remove">${ICON_TRASH}</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-1.5">${formatSize(item.file.size)}</p>
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div class="progress-fill h-full bg-amber-400 rounded-full" style="width:0%"></div>
+                        </div>
+                        <span class="pct text-xs text-gray-500 w-8 text-right">0%</span>
+                    </div>
+                </div>`;
+            fileList.appendChild(card);
+        }
+
+        function updateProgress(id, pct) {
+            const card = document.getElementById(`card-${id}`);
+            if (!card) return;
+            card.querySelector('.progress-fill').style.width = `${pct}%`;
+            card.querySelector('.pct').textContent = `${pct}%`;
+        }
+
+        function setCardDone(id) {
+            const card = document.getElementById(`card-${id}`);
+            if (!card) return;
+            card.querySelector('.icon-wrap').className = 'icon-wrap w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center bg-green-100 text-green-600';
+            card.querySelector('.icon-wrap').innerHTML = ICON_DONE;
+            card.querySelector('.progress-fill').className = 'progress-fill h-full bg-green-500 rounded-full';
+            card.querySelector('.progress-fill').style.width = '100%';
+            card.querySelector('.pct').textContent = '100%';
+            const btn = card.querySelector('[data-remove]');
+            if (btn) { btn.innerHTML = `<span class="text-green-500">${ICON_CHECK}</span>`; btn.removeAttribute('data-remove'); }
+        }
+
+        function setCardError(id) {
+            const card = document.getElementById(`card-${id}`);
+            if (!card) return;
+            card.querySelector('.icon-wrap').className = 'icon-wrap w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center bg-red-100 text-red-500';
+            card.querySelector('.icon-wrap').innerHTML = ICON_ERROR;
+            card.querySelector('.progress-fill').className = 'progress-fill h-full bg-red-400 rounded-full';
+            card.querySelector('.progress-fill').style.width = '4px';
+            card.querySelector('.pct').textContent = '0%';
+        }
+
+        function uploadFile(item) {
+            return new Promise((resolve, reject) => {
+                const data = new FormData();
+                data.append('file', item.file, item.file.name);
+                item.status = 'uploading';
+                const xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener('progress', e => {
+                    if (e.lengthComputable) updateProgress(item.id, Math.round(e.loaded / e.total * 100));
+                });
+                xhr.addEventListener('load', () => {
+                    let res;
+                    try { res = JSON.parse(xhr.responseText); } catch (e) {
+                        item.status = 'error'; setCardError(item.id); return reject();
+                    }
+                    if (res.success) {
+                        item.status = 'done'; item.filename = res.filename; item.dropboxPath = res.dropbox_path; item.dropboxLink = res.dropbox_link || '';
+                        setCardDone(item.id); resolve();
+                    } else {
+                        item.status = 'error'; setCardError(item.id);
+                        addErrorCard(res.message); reject();
+                    }
+                });
+                xhr.addEventListener('error', () => { item.status = 'error'; setCardError(item.id); reject(); });
+                xhr.open('POST', `/upload/${TOKEN}/file/`);
+                xhr.setRequestHeader('X-CSRFToken', getCsrf());
+                xhr.send(data);
+            });
+        }
+
+        function handleSubmit() {
+            formMsg.className = 'hidden';
+            if (queue.length === 0) return showFormMsg('error', 'Please select at least one file to upload.');
+            const stillUploading = queue.some(i => i.status === 'uploading' || i.status === 'pending');
+            if (stillUploading) return showFormMsg('error', 'Files are still uploading — please wait.');
+            const failed = queue.filter(i => i.status === 'error');
+            if (failed.length > 0) return showFormMsg('error', `${failed.length} file(s) failed. Remove them and try again.`);
+
+            const files = queue.map(i => ({ filename: i.filename, dropbox_path: i.dropboxPath, dropbox_link: i.dropboxLink || '' }));
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting…';
+
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                let res;
+                try { res = JSON.parse(xhr.responseText); } catch (e) { res = { success: false }; }
+                if (res.success) {
+                    window.location.href = res.redirect_url;
+                    return;
+                }
+                submitBtn.disabled = false; submitBtn.textContent = 'Submit';
+                showFormMsg('error', res.message || 'Something went wrong. Please try again.');
+            });
+            xhr.addEventListener('error', () => {
+                submitBtn.disabled = false; submitBtn.textContent = 'Submit';
+                showFormMsg('error', 'Network error. Please try again.');
+            });
+            xhr.open('POST', `/upload/${TOKEN}/submit/`);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('X-CSRFToken', getCsrf());
+            xhr.send(JSON.stringify({ message: messageEl.value.trim(), files }));
+        }
+
+        function syncSubmit() {
+            const busy = queue.some(i => i.status === 'uploading' || i.status === 'pending');
+            submitBtn.disabled = busy;
+            submitBtn.textContent = busy ? 'Uploading…' : 'Submit';
+        }
+
+        function showFormMsg(type, text) {
+            formMsg.className = type === 'success'
+                ? 'flex items-start gap-2 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm'
+                : 'flex items-start gap-2 bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm';
+            formMsg.innerHTML = `<p>${esc(text)}</p>`;
+        }
+
+        function formatSize(b) {
+            return b >= 1048576 ? (b / 1048576).toFixed(1).replace(/\.0$/, '') + ' MB' : Math.round(b / 1024) + ' KB';
+        }
+
+        function esc(s) {
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+    })();
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # Builders Signs — Banner Designer
 
-Post-purchase wizard: template gallery → dynamic details form → logo upload (now or later) → confirmation.
+Post-purchase wizard: template gallery → dynamic details form → logo upload (now, straight into the
+uploader below, or later via an emailed link) → Dropbox-backed uploader → thank-you/timeline page.
 
 ## Local development
 
@@ -55,6 +56,9 @@ Target: `design.builderssigns.com.au`, Python 3.9.23 via cPanel's Setup Python A
      mailbox's SMTP details (or whichever provider you want to send admin notifications through)
    - `DEFAULT_FROM_EMAIL`
    - `ADMIN_NOTIFY_EMAIL`
+   - `DROPBOX_APP_KEY`, `DROPBOX_APP_SECRET`, `DROPBOX_REFRESH_TOKEN` — copy these three values from
+     wherever Proof Flow's uploader has them set (Railway env vars); same Dropbox app, same
+     `/Customer Uploads/` destination, just a different folder path underneath it
 
 7. **Migrate + collect static** — still inside the activated virtualenv, in Terminal:
    ```
@@ -67,6 +71,7 @@ Target: `design.builderssigns.com.au`, Python 3.9.23 via cPanel's Setup Python A
 
 8. **Restart** the app from Setup Python App.
 
-Deferred logos are tracked manually for now: the admin list shows `logo_deferred_at` for each
-request, and there's a "Mark logo received" bulk action once you've matched an upload from the
-standalone uploader to its order.
+Uploads go through this app's own cloned uploader now (`/upload/<token>/`), which pushes straight to
+Dropbox and auto-marks the request as `logo_uploaded` on successful submit — no manual tracking needed
+for that path. The admin's "awaiting logo age" filter and "Mark logo received" action are still there
+as a manual fallback (e.g. a client emails a file directly instead of using the uploader).

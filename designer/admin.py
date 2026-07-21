@@ -3,12 +3,19 @@ from datetime import timedelta
 from django.contrib import admin
 from django.utils import timezone
 
-from .models import DesignRequest, Template, TemplateGroup
+from .models import DesignRequest, Template, TemplateGroup, UploadedFile
 
 
 class TemplateInline(admin.TabularInline):
     model = Template
     extra = 1
+
+
+class UploadedFileInline(admin.TabularInline):
+    model = UploadedFile
+    extra = 0
+    readonly_fields = ('filename', 'dropbox_path', 'dropbox_link', 'uploaded_at')
+    can_delete = False
 
 
 class AwaitingLogoAgeFilter(admin.SimpleListFilter):
@@ -52,8 +59,9 @@ class DesignRequestAdmin(admin.ModelAdmin):
     search_fields = ('order_number', 'client_email')
     readonly_fields = ('created_at', 'updated_at')
     actions = ['mark_logo_received']
+    inlines = [UploadedFileInline]
 
-    @admin.action(description='Mark logo received (e.g. arrived via the standalone uploader)')
+    @admin.action(description='Mark logo received (e.g. a client emailed it directly instead of using the uploader)')
     def mark_logo_received(self, request, queryset):
         updated = queryset.update(status=DesignRequest.Status.LOGO_UPLOADED)
         self.message_user(request, f'{updated} request(s) marked as logo received.')

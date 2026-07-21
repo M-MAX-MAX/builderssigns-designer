@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 
@@ -43,6 +45,10 @@ class DesignRequest(models.Model):
         LOGO_UPLOADED = 'logo_uploaded', 'Logo uploaded'
         COMPLETE = 'complete', 'Complete'
 
+    # Opaque identifier for the upload page link (emailed to clients who
+    # defer, so it has to work without relying on their session).
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+
     template = models.ForeignKey(Template, on_delete=models.PROTECT, related_name='design_requests')
     client_email = models.EmailField()
     order_number = models.CharField(max_length=100)
@@ -52,10 +58,6 @@ class DesignRequest(models.Model):
     background_colour = models.CharField(max_length=20, blank=True)
     comments = models.TextField(blank=True)
 
-    # Logos (and any extra files, e.g. a custom association logo) are
-    # uploaded through the separate Dropbox-backed uploader, not stored
-    # here — status is set manually via the "Mark logo received" admin
-    # action once the file shows up there.
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DETAILS_SUBMITTED)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -66,3 +68,20 @@ class DesignRequest(models.Model):
 
     def __str__(self):
         return f"{self.order_number} — {self.client_email} ({self.template.name})"
+
+
+class UploadedFile(models.Model):
+    """A logo (or extra file, e.g. a custom association logo) uploaded to
+    Dropbox for a DesignRequest via the internal uploader."""
+
+    design_request = models.ForeignKey(DesignRequest, on_delete=models.CASCADE, related_name='uploaded_files')
+    filename = models.CharField(max_length=300)
+    dropbox_path = models.CharField(max_length=500)
+    dropbox_link = models.URLField(blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['uploaded_at']
+
+    def __str__(self):
+        return self.filename

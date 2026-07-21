@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 
-UPLOADER_URL = "https://fproof.au/upload/builders-signs/"
-
 
 def _field_lines(design_request):
     lines = [
@@ -39,7 +37,7 @@ def _field_lines(design_request):
 def notify_admin_of_details(design_request):
     subject = f"New banner design request — order {design_request.order_number}"
     body = "\n".join(_field_lines(design_request) + [
-        "", "Logo (and any extra files) will come through the standalone uploader separately.",
+        "", "Logo (and any extra files) will come through the uploader separately.",
     ])
     EmailMessage(
         subject=subject,
@@ -49,12 +47,12 @@ def notify_admin_of_details(design_request):
     ).send(fail_silently=False)
 
 
-def notify_client_uploader_link(design_request):
+def notify_client_uploader_link(design_request, upload_url):
     subject = "Your logo upload link — Builders Signs"
     body = (
         f"Hi,\n\nThanks for your banner design details (order {design_request.order_number}). "
         "When you're ready, upload your logo (and anything else we'll need, like a different "
-        f"association logo) here:\n\n{UPLOADER_URL}\n\n"
+        f"association logo) here:\n\n{upload_url}\n\n"
         "We'll have your design with you within 4 hours of receiving it.\n\nThanks,\nBuilders Signs"
     )
     EmailMessage(
@@ -62,4 +60,20 @@ def notify_client_uploader_link(design_request):
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[design_request.client_email],
+    ).send(fail_silently=False)
+
+
+def notify_admin_of_upload(design_request, files):
+    """files: list of dicts with 'filename' and 'dropbox_link'."""
+    subject = f"Logo received — order {design_request.order_number}"
+    file_lines = [
+        f"- {f.get('filename', '')}" + (f" — {f['dropbox_link']}" if f.get('dropbox_link') else '')
+        for f in files
+    ]
+    body = "\n".join(_field_lines(design_request) + ["", "Files uploaded:"] + file_lines)
+    EmailMessage(
+        subject=subject,
+        body=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[settings.ADMIN_NOTIFY_EMAIL],
     ).send(fail_silently=False)

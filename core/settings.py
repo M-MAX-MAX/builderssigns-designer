@@ -152,3 +152,9 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@builderssigns
 ADMIN_NOTIFY_EMAIL = os.environ.get('ADMIN_NOTIFY_EMAIL', 'marcus@focusbanners.com.au')
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+
+# Dropbox — logo/artwork uploader. Same app as Proof Flow's uploader;
+# copy the same three values into this project's environment.
+DROPBOX_APP_KEY = os.environ.get('DROPBOX_APP_KEY', '')
+DROPBOX_APP_SECRET = os.environ.get('DROPBOX_APP_SECRET', '')
+DROPBOX_REFRESH_TOKEN = os.environ.get('DROPBOX_REFRESH_TOKEN', '')
