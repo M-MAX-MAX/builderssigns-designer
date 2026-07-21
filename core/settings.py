@@ -43,13 +43,15 @@ CSRF_TRUSTED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    # 'designer' first so its registration/*.html templates (password
+    # reset flow) take precedence over django.contrib.admin's own versions.
+    'designer',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'designer',
 ]
 
 MIDDLEWARE = [
