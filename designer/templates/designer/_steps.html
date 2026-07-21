@@ -1,5 +1,8 @@
-<div class="steps">
-  <a href="{% url 'designer:gallery' %}" class="{% if current > 1 %}done{% elif current == 1 %}active{% endif %}">01</a>
-  <a href="{% url 'designer:details' %}" class="{% if current == 2 %}active{% endif %}">02</a>
-  <span>03</span>
+<div class="stepper-wrapper">
+  <div class="stepper-line"></div>
+  <div class="steps">
+    <a href="{% url 'designer:gallery' %}" class="{% if current >= 1 %}active{% endif %}">01</a>
+    <a href="{% url 'designer:details' %}" class="{% if current >= 2 %}active{% endif %}">02</a>
+    <span>03</span>
+  </div>
 </div>

@@ -2,14 +2,24 @@
 {% block content %}
   <h1>Choose Your Banner Template</h1>
   {% include "designer/_steps.html" with current=1 %}
-  <div class="banner">
+  <p class="description">
     These are starting points only — background colour and fonts can all be changed to match
     your brand on the next step, and templates aren't limited to the colours shown here.
-  </div>
+  </p>
 
   {% for group in groups %}
     <div class="gallery-group">
-      <h2>{{ group.name }}</h2>
+      <div class="divider-container">
+        <div class="divider-line left"></div>
+        <div class="divider-badge">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 1.875V10.125" stroke="#404040" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2.625 6.75L6 10.125L9.375 6.75" stroke="#404040" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>{{ group.name }}</span>
+        </div>
+        <div class="divider-line right"></div>
+      </div>
       <div class="gallery-grid">
         {% for template in group.templates.all %}
           {% if template.is_active %}

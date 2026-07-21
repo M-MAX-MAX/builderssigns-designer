@@ -4,22 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Design Your Banner — Builders Signs{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root { --bs-yellow: #f5c518; --bs-black: #111111; }
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; color: var(--bs-black); background: #fafafa; }
+    body { font-family: 'Inter', sans-serif; margin: 0; color: var(--bs-black); background: #fafafa; }
     header { display: flex; align-items: center; padding: 16px 32px; background: #fff; border-bottom: 1px solid #eee; }
     header .logo { font-weight: 700; font-size: 18px; }
     main { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
-    h1 { font-size: 28px; margin-bottom: 8px; }
-    .steps { display: flex; gap: 8px; margin: 24px 0 32px; }
+    h1 { color: #171717; font-size: 30px; font-weight: 600; line-height: 38px; margin: 0 0 20px; }
+    .description { color: #525252; font-size: 16px; font-weight: 400; line-height: 24px; margin: 0 0 24px; }
+
+    /* Stepper */
+    .stepper-wrapper { position: relative; display: flex; align-items: center; width: 170px; margin-bottom: 24px; }
+    .stepper-line { position: absolute; top: 50%; left: 10px; right: 10px; transform: translateY(-50%); border-top: 1px dashed #D4D4D4; z-index: 1; }
+    .steps { display: flex; justify-content: space-between; width: 100%; position: relative; z-index: 2; }
     .steps a, .steps span {
-      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-size: 13px; background: #e5e5e5; color: #888; text-decoration: none;
+      width: 30px; height: 30px; box-sizing: border-box; border-radius: 50%; display: flex;
+      justify-content: center; align-items: center; font-size: 10px; font-weight: 600; text-decoration: none;
+      background: #FAFAFA; color: #525252; border: 1px solid #E5E5E5;
     }
-    .steps a { cursor: pointer; }
-    .steps a.active { background: var(--bs-black); color: #fff; }
-    .steps a.done { background: #333; color: #fff; }
+    .steps a.active { background: #0A0A0A; color: #fff; border-color: #0A0A0A; }
+
+    /* Group divider */
+    .divider-container { display: flex; align-items: center; width: 100%; gap: 14px; margin: 32px 0 16px; }
+    .divider-line { flex-grow: 1; height: 1px; }
+    .divider-line.left { background: linear-gradient(to right, rgba(212,212,212,0) 0%, #D4D4D4 100%); }
+    .divider-line.right { background: linear-gradient(to left, rgba(212,212,212,0) 0%, #D4D4D4 100%); }
+    .divider-badge {
+      display: flex; align-items: center; gap: 4px; padding: 4px 10px 4px 12px; background: #FAFAFA;
+      border-radius: 16px; border: 1px solid #E5E5E5; color: #404040; font-size: 14px; font-weight: 500; line-height: 20px;
+    }
+
     fieldset { border: none; padding: 0; margin: 0 0 20px; }
     label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
     input[type=text], input[type=email], input[type=url], input[type=file], select, textarea {
@@ -42,7 +60,6 @@
     .checkbox-row label { display: inline-flex; align-items: center; gap: 6px; font-weight: 400; margin-right: 16px; }
     .checkbox-row input { width: auto; margin-bottom: 0; }
     .gallery-group { margin-bottom: 40px; }
-    .gallery-group h2 { font-size: 16px; text-transform: uppercase; letter-spacing: .04em; color: #666; border-bottom: 1px solid #eee; padding-bottom: 8px; }
     .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
     .tile { border: 1px solid #e5e5e5; border-radius: 6px; overflow: hidden; background: #fff; }
     .tile img { width: 100%; display: block; cursor: zoom-in; }
@@ -50,7 +67,6 @@
     .tile .tile-footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px 8px; }
     .tile .zoom-btn { border: none; background: none; cursor: zoom-in; font-size: 16px; }
     .tile .use-btn { font-size: 12px; padding: 6px 10px; }
-    .banner { background: #fff8e1; border: 1px solid var(--bs-yellow); padding: 12px 16px; border-radius: 4px; font-size: 13px; margin-bottom: 24px; }
     .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); align-items: center; justify-content: center; z-index: 50; }
     .lightbox.open { display: flex; }
     .lightbox img { max-width: 90vw; max-height: 90vh; background: #fff; }
