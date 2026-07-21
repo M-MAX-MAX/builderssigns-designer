@@ -44,6 +44,7 @@ def notify_admin_of_details(design_request):
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[settings.ADMIN_NOTIFY_EMAIL],
+        reply_to=[design_request.client_email],
     ).send(fail_silently=False)
 
 
@@ -60,6 +61,7 @@ def notify_client_uploader_link(design_request, upload_url):
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[design_request.client_email],
+        reply_to=[settings.ADMIN_NOTIFY_EMAIL],
     ).send(fail_silently=False)
 
 
@@ -76,4 +78,5 @@ def notify_admin_of_upload(design_request, files):
         body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[settings.ADMIN_NOTIFY_EMAIL],
+        reply_to=[design_request.client_email],
     ).send(fail_silently=False)
