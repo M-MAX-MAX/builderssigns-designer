@@ -1,21 +1,21 @@
 from django import forms
 
-# Bold-weight Google Fonts offered on step 2. Anton and Bebas Neue only ship
-# one (already-heavy) weight on Google Fonts, so they're loaded at 400
-# rather than a synthetic/faked 700.
+# Google Fonts offered on step 2, matching the supplied design reference.
 FONT_OPTIONS = [
-    {'value': 'montserrat', 'label': 'Montserrat', 'family': 'Montserrat', 'weight': 700},
-    {'value': 'poppins', 'label': 'Poppins', 'family': 'Poppins', 'weight': 700},
-    {'value': 'oswald', 'label': 'Oswald', 'family': 'Oswald', 'weight': 700},
-    {'value': 'roboto', 'label': 'Roboto', 'family': 'Roboto', 'weight': 700},
-    {'value': 'open_sans', 'label': 'Open Sans', 'family': 'Open Sans', 'weight': 700},
-    {'value': 'lato', 'label': 'Lato', 'family': 'Lato', 'weight': 700},
-    {'value': 'raleway', 'label': 'Raleway', 'family': 'Raleway', 'weight': 700},
-    {'value': 'playfair_display', 'label': 'Playfair Display', 'family': 'Playfair Display', 'weight': 700},
+    {'value': 'inter', 'label': 'Inter (Default)', 'family': 'Inter', 'weight': 400},
+    {'value': 'poppins', 'label': 'Poppins', 'family': 'Poppins', 'weight': 400},
+    {'value': 'roboto_condensed', 'label': 'Roboto Condensed', 'family': 'Roboto Condensed', 'weight': 400},
+    {'value': 'merienda_one', 'label': 'Merienda One', 'family': 'Merienda One', 'weight': 400},
+    {'value': 'passion_one', 'label': 'Passion One', 'family': 'Passion One', 'weight': 400},
+    {'value': 'oswald', 'label': 'Oswald', 'family': 'Oswald', 'weight': 400},
+    {'value': 'merriweather', 'label': 'Merriweather', 'family': 'Merriweather', 'weight': 400},
     {'value': 'anton', 'label': 'Anton', 'family': 'Anton', 'weight': 400},
     {'value': 'bebas_neue', 'label': 'Bebas Neue', 'family': 'Bebas Neue', 'weight': 400},
+    {'value': 'oxanium', 'label': 'Oxanium', 'family': 'Oxanium', 'weight': 400},
 ]
-FONT_CHOICES = [(f['value'], f['label']) for f in FONT_OPTIONS] + [('other', 'Other — tell us below')]
+FONT_CHOICES = [(f['value'], f['label']) for f in FONT_OPTIONS] + [
+    ('other', "Can't find my font - type it below")
+]
 
 
 class DetailsForm(forms.Form):
@@ -27,7 +27,9 @@ class DetailsForm(forms.Form):
     background_colour = forms.CharField(
         label='Background Colour', widget=forms.TextInput(attrs={'type': 'color'})
     )
-    font_choice = forms.ChoiceField(label='Choose Font', choices=FONT_CHOICES, required=False)
+    font_choice = forms.ChoiceField(
+        label='Choose Font', choices=FONT_CHOICES, required=False, initial='inter'
+    )
     font_custom_text = forms.CharField(
         label="Can't find your brand font? Tell us what it is", required=False
     )

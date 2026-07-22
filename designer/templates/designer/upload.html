@@ -17,6 +17,17 @@
         }
         body { font-family: 'Inter', sans-serif; }
         .progress-fill { transition: width 0.25s ease; }
+
+        /* Stepper (matches designer/base.html) */
+        .stepper-wrapper { position: relative; display: flex; align-items: center; justify-content: center; margin: 0 auto 32px; }
+        .stepper-line { position: absolute; top: 50%; left: 30px; right: 30px; transform: translateY(-50%); border-top: 2px dashed #D4D4D4; z-index: 1; }
+        .steps { display: flex; justify-content: space-between; gap: 60px; position: relative; z-index: 2; }
+        .steps a, .steps span {
+            width: 60px; height: 60px; box-sizing: border-box; border-radius: 50%; display: flex;
+            justify-content: center; align-items: center; font-size: 18px; font-weight: 600; text-decoration: none;
+            background: #FAFAFA; color: #525252; border: 2px solid #E5E5E5;
+        }
+        .steps a.active, .steps span.active { background: #F0FDF4; color: #15803D; border-color: #15803D; }
     </style>
 </head>
 <body class="bg-white min-h-screen">
@@ -30,6 +41,7 @@
     <main class="max-w-4xl mx-auto px-6 py-10">
 
         <h1 class="text-2xl font-bold text-center text-gray-900 mb-2">Upload Your Logo</h1>
+        {% include "designer/_steps.html" with current=3 %}
         <p class="text-center text-sm text-gray-500 mb-8">
             Order {{ design_request.order_number }} — {{ design_request.client_email }}
         </p>

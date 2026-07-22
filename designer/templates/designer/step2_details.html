@@ -3,11 +3,14 @@
 {% block extra_head %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@700&family=Oswald:wght@700&family=Roboto:wght@700&family=Open+Sans:wght@700&family=Lato:wght@700&family=Raleway:wght@700&family=Playfair+Display:wght@700&family=Anton&family=Bebas+Neue&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Merienda+One&family=Merriweather&family=Oswald&family=Oxanium&family=Passion+One&family=Poppins&family=Roboto+Condensed&display=swap">
 {% endblock %}
 {% block content %}
-  <h1>Edit the {{ template.name }} Template</h1>
+  <h1>Enter Your Site &amp; Company Details</h1>
   {% include "designer/_steps.html" with current=2 %}
+  <p class="description">
+    Fill in your site details below so our pre-press team has everything needed to build and email your print proof.
+  </p>
 
   <form method="post">
     {% csrf_token %}
@@ -23,14 +26,40 @@
         {{ form.order_number }}
         {{ form.order_number.errors }}
       </div>
+      <div class="field">
+        {{ form.background_colour.label_tag }}
+        <div class="colour-field">
+          <div class="colour-btn">{{ form.background_colour }}</div>
+          <span class="colour-hex" data-colour-hex>{{ form.background_colour.value|default:'#000000' }}</span>
+        </div>
+      </div>
     </fieldset>
 
     {% for field in template.group.field_schema %}
-      <fieldset>
-        {% if field.type == 'social' %}
+      {% if field.key == 'builders_no' %}
+        {# rendered together with phone below #}
+      {% elif field.key == 'phone' %}
+        <fieldset class="row-2-col">
+          <div class="field">
+            {% with bound_field=form|get_item:field.key %}
+              <label>{{ field.label }}{% if field.required %} <span class="req">*</span>{% endif %}</label>
+              {{ bound_field }}
+              {{ bound_field.errors }}
+            {% endwith %}
+          </div>
+          {% with builders_field=form|get_item:'builders_no' %}
+            <div class="field">
+              <label>Builders No.{% if builders_field.field.required %} <span class="req">*</span>{% endif %}</label>
+              {{ builders_field }}
+              {{ builders_field.errors }}
+            </div>
+          {% endwith %}
+        </fieldset>
+      {% elif field.type == 'social' %}
+        <fieldset class="row-2-col">
           <div class="field">
             {% with handle_field=form|get_item:field.key %}
-              {{ handle_field.label_tag }}
+              <label>{{ field.label }}{% if field.required %} <span class="req">*</span>{% endif %}</label>
               {{ handle_field }}
               {{ handle_field.errors }}
             {% endwith %}
@@ -43,46 +72,42 @@
               {% endwith %}
             {% endwith %}
           </div>
-        {% elif field.type == 'choice' %}
+        </fieldset>
+      {% elif field.type == 'choice' %}
+        <fieldset>
           <div class="field checkbox-row">
             {% with choice_field=form|get_item:field.key %}
-              <label>Select your {{ field.label }}</label>
+              <label>Select your {{ field.label }}{% if field.required %} <span class="req">*</span>{% endif %}</label>
               {{ choice_field }}
               {{ choice_field.errors }}
             {% endwith %}
-            {% if field.note %}<p class="help">{{ field.note }}</p>{% endif %}
           </div>
-        {% else %}
+          {% if field.note %}<p class="help">{{ field.note }}</p>{% endif %}
+        </fieldset>
+      {% else %}
+        <fieldset>
           <div class="field">
             {% with bound_field=form|get_item:field.key %}
-              {{ bound_field.label_tag }}
+              <label>{{ field.label }}{% if field.required %} <span class="req">*</span>{% endif %}</label>
               {{ bound_field }}
               {{ bound_field.errors }}
             {% endwith %}
           </div>
-        {% endif %}
-      </fieldset>
+        </fieldset>
+      {% endif %}
     {% endfor %}
 
     <fieldset>
-      <div class="field">
-        {{ form.background_colour.label_tag }}
-        <div class="colour-field">
-          {{ form.background_colour }}
-          <span class="colour-hex" data-colour-hex>{{ form.background_colour.value|default:'#000000' }}</span>
-        </div>
-      </div>
       <div class="field">
         {{ form.font_choice.label_tag }}
         <div class="font-picker" data-picker>
           <button type="button" class="font-picker-toggle" data-picker-toggle>Select a font</button>
           <select name="font_choice" id="id_font_choice" hidden>
-            <option value="">— Select —</option>
             {% for f in font_options %}
               <option value="{{ f.value }}" data-family="{{ f.family }}" data-weight="{{ f.weight }}"
                 {% if form.font_choice.value == f.value %}selected{% endif %}>{{ f.label }}</option>
             {% endfor %}
-            <option value="other" {% if form.font_choice.value == 'other' %}selected{% endif %}>Other — tell us below</option>
+            <option value="other" {% if form.font_choice.value == 'other' %}selected{% endif %}>Can't find my font - type it below</option>
           </select>
           <div class="font-picker-list" data-picker-list hidden></div>
         </div>
@@ -98,15 +123,15 @@
       </div>
     </fieldset>
 
-    <p class="help">
+    <div class="button-row">
+      <button type="submit" name="upload_choice" value="now" class="btn">Upload Logo Now</button>
+      <button type="submit" name="upload_choice" value="later" class="btn btn-secondary">Upload Logo Later</button>
+    </div>
+
+    <p class="help" style="margin-top: 16px;">
       Once we have your logo, your design will be with you within <strong>4 hours</strong>. We'll
       include an estimated production and delivery timeline with the proof we send for approval.
     </p>
-
-    <div class="button-row">
-      <button type="submit" name="upload_choice" value="now" class="btn">Click Here to Upload Logo</button>
-      <button type="submit" name="upload_choice" value="later" class="btn btn-secondary">Click Here to Upload Later</button>
-    </div>
   </form>
 
   <script>
@@ -124,34 +149,39 @@
       function applyFont(el, opt) {
         if (opt && opt.dataset.family) {
           el.style.fontFamily = `'${opt.dataset.family}', sans-serif`;
-          el.style.fontWeight = opt.dataset.weight || '400';
         } else {
           el.style.fontFamily = '';
-          el.style.fontWeight = '';
         }
       }
 
       function updateToggle() {
         const selected = select.options[select.selectedIndex];
-        toggle.textContent = (selected && selected.value) ? selected.textContent : 'Select a font';
-        applyFont(toggle, selected && selected.value ? selected : null);
+        toggle.textContent = selected ? selected.textContent : 'Select a font';
+        applyFont(toggle, selected);
       }
 
       Array.from(select.options).forEach(opt => {
-        if (!opt.value) return;
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'font-picker-option';
 
-        const nameLine = document.createElement('span');
-        nameLine.textContent = opt.textContent;
-        btn.appendChild(nameLine);
+        if (opt.value === 'other') {
+          btn.textContent = opt.textContent;
+        } else {
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.justifyContent = 'space-between';
+          row.style.gap = '12px';
 
-        if (opt.dataset.family) {
-          const capsLine = document.createElement('span');
-          capsLine.className = 'font-caps';
-          capsLine.textContent = opt.textContent;
-          btn.appendChild(capsLine);
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = opt.textContent;
+          const sampleSpan = document.createElement('span');
+          sampleSpan.textContent = 'Your Company';
+          sampleSpan.style.color = '#A3A3A3';
+
+          row.appendChild(nameSpan);
+          row.appendChild(sampleSpan);
+          btn.appendChild(row);
         }
 
         applyFont(btn, opt);
