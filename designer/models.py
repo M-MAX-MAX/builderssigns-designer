@@ -32,10 +32,20 @@ class Template(models.Model):
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
+    # Internal-only reference number for identifying which template a client
+    # picked — never shown on the client-facing gallery/form, only in admin
+    # and the admin notification emails.
+    internal_number = models.PositiveIntegerField(
+        blank=True, null=True, unique=True,
+        help_text="Internal reference number — not shown to clients.",
+    )
+
     class Meta:
         ordering = ['order', 'name']
 
     def __str__(self):
+        if self.internal_number:
+            return f'#{self.internal_number} — {self.name}'
         return self.name
 
 

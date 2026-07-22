@@ -9,6 +9,7 @@ from .models import DesignRequest, Template, TemplateGroup, UploadedFile
 class TemplateInline(admin.TabularInline):
     model = Template
     extra = 1
+    fields = ('internal_number', 'name', 'slug', 'svg_asset', 'order', 'is_active')
 
 
 class UploadedFileInline(admin.TabularInline):
@@ -47,7 +48,8 @@ class TemplateGroupAdmin(admin.ModelAdmin):
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'group', 'order', 'is_active')
+    list_display = ('name', 'internal_number', 'group', 'order', 'is_active')
+    list_editable = ('internal_number',)
     list_filter = ('group', 'is_active')
     prepopulated_fields = {'slug': ('name',)}
 

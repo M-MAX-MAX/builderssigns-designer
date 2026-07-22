@@ -3,8 +3,10 @@ from django.core.mail import EmailMessage
 
 
 def _field_lines(design_request):
+    template = design_request.template
+    template_label = f"#{template.internal_number} — {template.name}" if template.internal_number else template.name
     lines = [
-        f"Template: {design_request.template.name} ({design_request.template.group.name})",
+        f"Template: {template_label} ({template.group.name})",
         f"Order number: {design_request.order_number}",
         f"Client email: {design_request.client_email}",
         f"Background colour: {design_request.background_colour}",
