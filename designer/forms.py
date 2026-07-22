@@ -1,17 +1,20 @@
 from django import forms
 
 # Google Fonts offered on step 2, matching the supplied design reference.
+# Bold weight throughout — Merienda One, Anton, and Bebas Neue only ship one
+# (already-heavy) weight on Google Fonts, so those load at 400 instead of a
+# synthetic/faked 700.
 FONT_OPTIONS = [
-    {'value': 'inter', 'label': 'Inter (Default)', 'family': 'Inter', 'weight': 400},
-    {'value': 'poppins', 'label': 'Poppins', 'family': 'Poppins', 'weight': 400},
-    {'value': 'roboto_condensed', 'label': 'Roboto Condensed', 'family': 'Roboto Condensed', 'weight': 400},
+    {'value': 'inter', 'label': 'Inter (Default)', 'family': 'Inter', 'weight': 700},
+    {'value': 'poppins', 'label': 'Poppins', 'family': 'Poppins', 'weight': 700},
+    {'value': 'roboto_condensed', 'label': 'Roboto Condensed', 'family': 'Roboto Condensed', 'weight': 700},
     {'value': 'merienda_one', 'label': 'Merienda One', 'family': 'Merienda One', 'weight': 400},
-    {'value': 'passion_one', 'label': 'Passion One', 'family': 'Passion One', 'weight': 400},
-    {'value': 'oswald', 'label': 'Oswald', 'family': 'Oswald', 'weight': 400},
-    {'value': 'merriweather', 'label': 'Merriweather', 'family': 'Merriweather', 'weight': 400},
+    {'value': 'passion_one', 'label': 'Passion One', 'family': 'Passion One', 'weight': 700},
+    {'value': 'oswald', 'label': 'Oswald', 'family': 'Oswald', 'weight': 700},
+    {'value': 'merriweather', 'label': 'Merriweather', 'family': 'Merriweather', 'weight': 700},
     {'value': 'anton', 'label': 'Anton', 'family': 'Anton', 'weight': 400},
     {'value': 'bebas_neue', 'label': 'Bebas Neue', 'family': 'Bebas Neue', 'weight': 400},
-    {'value': 'oxanium', 'label': 'Oxanium', 'family': 'Oxanium', 'weight': 400},
+    {'value': 'oxanium', 'label': 'Oxanium', 'family': 'Oxanium', 'weight': 700},
 ]
 FONT_CHOICES = [(f['value'], f['label']) for f in FONT_OPTIONS] + [
     ('other', "Can't find my font - type it below")
