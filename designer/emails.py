@@ -6,6 +6,7 @@ def _field_lines(design_request):
     template = design_request.template
     template_label = f"#{template.internal_number} — {template.name}" if template.internal_number else template.name
     lines = [
+        f"Product: {template.group.product.name}",
         f"Template: {template_label} ({template.group.name})",
         f"Order number: {design_request.order_number}",
         f"Client email: {design_request.client_email}",

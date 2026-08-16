@@ -3,7 +3,14 @@ from datetime import timedelta
 from django.contrib import admin
 from django.utils import timezone
 
-from .models import DesignRequest, Template, TemplateGroup, UploadedFile
+from .models import DesignRequest, Product, Template, TemplateGroup, UploadedFile
+
+
+class TemplateGroupInline(admin.TabularInline):
+    model = TemplateGroup
+    extra = 1
+    fields = ('name', 'slug', 'order')
+    show_change_link = True
 
 
 class TemplateInline(admin.TabularInline):
@@ -39,9 +46,17 @@ class AwaitingLogoAgeFilter(admin.SimpleListFilter):
         )
 
 
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug', 'order', 'is_active')
+    prepopulated_fields = {'slug': ('name',)}
+    inlines = [TemplateGroupInline]
+
+
 @admin.register(TemplateGroup)
 class TemplateGroupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'order')
+    list_display = ('name', 'product', 'slug', 'order')
+    list_filter = ('product',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [TemplateInline]
 
@@ -50,14 +65,14 @@ class TemplateGroupAdmin(admin.ModelAdmin):
 class TemplateAdmin(admin.ModelAdmin):
     list_display = ('name', 'internal_number', 'group', 'order', 'is_active')
     list_editable = ('internal_number',)
-    list_filter = ('group', 'is_active')
+    list_filter = ('group__product', 'group', 'is_active')
     prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(DesignRequest)
 class DesignRequestAdmin(admin.ModelAdmin):
     list_display = ('order_number', 'client_email', 'template', 'status', 'created_at')
-    list_filter = ('status', 'template__group', AwaitingLogoAgeFilter)
+    list_filter = ('status', 'template__group__product', 'template__group', AwaitingLogoAgeFilter)
     search_fields = ('order_number', 'client_email')
     readonly_fields = ('created_at', 'updated_at')
     actions = ['mark_logo_received']

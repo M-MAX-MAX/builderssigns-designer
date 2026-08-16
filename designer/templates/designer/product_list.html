@@ -1,0 +1,14 @@
+{% extends "designer/base.html" %}
+{% block title %}Design Your Banner — Builders Signs{% endblock %}
+{% block content %}
+  <h1>Design Your Banner</h1>
+  <p class="description">Choose which product you're designing for to get started.</p>
+
+  <div class="button-row" style="margin-top: 24px;">
+    {% for product in products %}
+      <a class="btn" href="{% url 'designer:gallery' product.slug %}">{{ product.name }}</a>
+    {% empty %}
+      <p class="help">No products are set up yet.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

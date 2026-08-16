@@ -3,10 +3,29 @@ import uuid
 from django.db import models
 
 
+class Product(models.Model):
+    """A distinct product line (e.g. Banner Mesh, Corflute) — each has its
+    own set of TemplateGroups/Templates and its own entry URL for the
+    wizard, so an order-confirmation email can link straight to the
+    right one."""
+
+    name = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return self.name
+
+
 class TemplateGroup(models.Model):
     """A tier of templates that all share the same set of required fields
     (e.g. 'Logo only' vs 'Logo + Contact + Builders No.')."""
 
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='template_groups')
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     order = models.PositiveIntegerField(default=0)

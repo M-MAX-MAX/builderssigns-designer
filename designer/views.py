@@ -10,15 +10,21 @@ from django.views.decorators.http import require_POST
 from . import emails
 from .dropbox_service import upload_to_dropbox
 from .forms import FONT_OPTIONS, DetailsForm
-from .models import DesignRequest, Template, TemplateGroup, UploadedFile
+from .models import DesignRequest, Product, Template, TemplateGroup, UploadedFile
 
 ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png', 'ai', 'eps', 'svg', 'zip', 'tif', 'tiff', 'psd'}
 MAX_FILE_MB = 50
 
 
-def template_gallery(request):
-    groups = TemplateGroup.objects.prefetch_related('templates').all()
-    return render(request, 'designer/step1_gallery.html', {'groups': groups})
+def product_list(request):
+    products = Product.objects.filter(is_active=True)
+    return render(request, 'designer/product_list.html', {'products': products})
+
+
+def template_gallery(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug, is_active=True)
+    groups = product.template_groups.prefetch_related('templates').all()
+    return render(request, 'designer/step1_gallery.html', {'product': product, 'groups': groups})
 
 
 def select_template(request, slug):
@@ -31,9 +37,10 @@ def select_template(request, slug):
 def details(request):
     template_id = request.session.get('template_id')
     if not template_id:
-        return redirect('designer:gallery')
+        return redirect('designer:product_list')
     template = get_object_or_404(Template, id=template_id)
     group = template.group
+    product_slug = group.product.slug
 
     if request.method == 'POST':
         form = DetailsForm(request.POST, group=group)
@@ -61,14 +68,14 @@ def details(request):
         form = DetailsForm(group=group)
 
     return render(request, 'designer/step2_details.html', {
-        'form': form, 'template': template, 'font_options': FONT_OPTIONS,
+        'form': form, 'template': template, 'font_options': FONT_OPTIONS, 'product_slug': product_slug,
     })
 
 
 def upload_later(request):
     design_request_id = request.session.get('design_request_id')
     if not design_request_id:
-        return redirect('designer:gallery')
+        return redirect('designer:product_list')
     design_request = get_object_or_404(DesignRequest, id=design_request_id)
     return render(request, 'designer/upload_later.html', {'design_request': design_request})
 
@@ -80,6 +87,7 @@ def upload_page(request, token):
         'design_request': design_request,
         'allowed_types': ', '.join(sorted(ALLOWED_EXTENSIONS)).upper(),
         'max_file_mb': MAX_FILE_MB,
+        'product_slug': design_request.template.group.product.slug,
     })
 
 
