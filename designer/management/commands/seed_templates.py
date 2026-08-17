@@ -67,19 +67,14 @@ PRODUCTS = [
     {
         # Placeholder groups only, for local testing of the multi-product
         # flow — real groups/templates should be added via /admin/.
+        # Real catalog is loaded separately via `load_branding_corflute`
+        # (scoped command, safe to run on production) — this just creates
+        # the Product row + card image.
         'name': 'Branding Corflute',
         'slug': 'branding-corflute',
         'order': 2,
         'card_image_url': 'https://builderssigns.com.au/wp-content/uploads/2026/07/Branding-Corflutes-Templates.png',
-        'groups': [
-            {
-                'name': 'Logo only',
-                'slug': 'branding-corflute-logo-only',
-                'order': 1,
-                'field_schema': [],
-                'templates': ['Branding Corflute Logo Centered', 'Branding Corflute Logo Left'],
-            },
-        ],
+        'groups': [],
     },
     {
         # Real catalog is loaded separately via `load_compliance_corflute`
