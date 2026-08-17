@@ -22,6 +22,7 @@
     header { display: flex; align-items: center; padding: 16px 32px; background: #fff; border-bottom: 1px solid #eee; }
     header .logo { font-weight: 700; font-size: 18px; }
     main { max-width: 720px; margin: 0 auto; padding: 40px 24px; }
+    main.wide { max-width: 1216px; }
     h1 { color: #171717; font-size: 30px; font-weight: 600; line-height: 38px; margin: 0 0 20px; }
     .description { color: #525252; font-size: 16px; font-weight: 400; line-height: 24px; margin: 0 0 24px; }
 
@@ -85,14 +86,32 @@
     .checkbox-row { display: flex; align-items: center; gap: 20px; min-height: 44px; }
     .checkbox-row label { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; margin: 0; white-space: nowrap; }
     .checkbox-row input { width: auto; height: auto; margin-bottom: 0; }
-    .gallery-group { margin-bottom: 40px; }
-    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
-    .tile { border: 1px solid #e5e5e5; border-radius: 6px; overflow: hidden; background: #fff; }
-    .tile img { width: 100%; display: block; cursor: zoom-in; }
-    .tile .tile-label { margin: 0; padding: 8px 10px 0; font-size: 13px; color: #444; }
-    .tile .tile-footer { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px 8px; }
-    .tile .zoom-btn { border: none; background: none; cursor: zoom-in; font-size: 16px; }
-    .tile .use-btn { flex: none; font-size: 12px; padding: 6px 10px; }
+    .gallery-group { margin-bottom: 96px; }
+    .gallery-group:last-child { margin-bottom: 0; }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(3, 384px); gap: 32px; margin-top: 32px;
+      justify-content: center; width: 100%;
+    }
+    .gallery-grid.gallery-grid--landscape { grid-template-columns: repeat(2, 592px); }
+    @media (max-width: 1240px) {
+      .gallery-grid { grid-template-columns: repeat(2, 384px); }
+      .gallery-grid.gallery-grid--landscape { grid-template-columns: 1fr; max-width: 592px; margin-left: auto; margin-right: auto; }
+    }
+    @media (max-width: 840px) {
+      .gallery-grid { grid-template-columns: 1fr; max-width: 384px; margin-left: auto; margin-right: auto; }
+    }
+    .tile {
+      width: 100%; background: #F5F5F7; border-radius: 16px; border: 1px solid #E5E5E5;
+      padding: 10px 10px 20px; display: flex; flex-direction: column; align-items: center;
+    }
+    .tile img {
+      width: 100%; height: auto; border-radius: 12px; object-fit: contain; display: block;
+      background-color: #fff; cursor: zoom-in;
+    }
+    .tile .tile-label { margin: 0; padding: 12px 6px 0; font-size: 14px; font-weight: 500; color: #404040; align-self: flex-start; }
+    .tile .tile-footer { width: 100%; margin-top: 12px; padding: 0 6px; display: flex; justify-content: space-between; align-items: center; }
+    .tile .zoom-btn { border: none; background: none; cursor: zoom-in; font-size: 22px; color: var(--bs-ink); }
+    .tile .use-btn { flex: none; font-size: 14px; padding: 8px 14px; }
     .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); align-items: center; justify-content: center; z-index: 50; }
     .lightbox.open { display: flex; }
     .lightbox img { max-width: 90vw; max-height: 90vh; background: #fff; }
@@ -123,7 +142,7 @@
   <header>
     <div class="logo">Builders Signs — Design Your Banner</div>
   </header>
-  <main>
+  <main class="{% block main_class %}{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 </body>
