@@ -13,6 +13,10 @@ class Product(models.Model):
     slug = models.SlugField(unique=True)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    card_image = models.ImageField(
+        upload_to='products/', blank=True,
+        help_text="Shown on the product-picker card grid.",
+    )
 
     class Meta:
         ordering = ['order', 'name']
