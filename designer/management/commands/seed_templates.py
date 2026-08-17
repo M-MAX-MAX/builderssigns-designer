@@ -82,19 +82,14 @@ PRODUCTS = [
         ],
     },
     {
+        # Real catalog is loaded separately via `load_compliance_corflute`
+        # (scoped command, safe to run on production) — this just creates
+        # the Product row + card image.
         'name': 'Compliance Corflute',
         'slug': 'compliance-corflute',
         'order': 3,
         'card_image_url': 'https://builderssigns.com.au/wp-content/uploads/2026/07/Compliance-Corflutes-Templates.png',
-        'groups': [
-            {
-                'name': 'Logo only',
-                'slug': 'compliance-corflute-logo-only',
-                'order': 1,
-                'field_schema': [],
-                'templates': ['Compliance Corflute Logo Centered', 'Compliance Corflute Logo Left'],
-            },
-        ],
+        'groups': [],
     },
 ]
 
