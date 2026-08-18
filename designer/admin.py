@@ -2,8 +2,19 @@ from datetime import timedelta
 
 from django.contrib import admin
 from django.utils import timezone
+from django.utils.html import format_html
 
 from .models import DesignRequest, Product, Template, TemplateGroup, UploadedFile
+
+
+def _image_preview(file_field, height):
+    if not file_field:
+        return '(no image)'
+    return format_html(
+        '<img src="{}" style="height:{}px; max-width:100%; object-fit:contain; '
+        'border:1px solid #ddd; border-radius:6px; background:#fff;">',
+        file_field.url, height,
+    )
 
 
 class TemplateGroupInline(admin.TabularInline):
@@ -16,7 +27,12 @@ class TemplateGroupInline(admin.TabularInline):
 class TemplateInline(admin.TabularInline):
     model = Template
     extra = 1
-    fields = ('internal_number', 'name', 'slug', 'svg_asset', 'order', 'is_active')
+    fields = ('svg_preview', 'internal_number', 'name', 'slug', 'svg_asset', 'order', 'is_active')
+    readonly_fields = ('svg_preview',)
+
+    @admin.display(description='Preview')
+    def svg_preview(self, obj):
+        return _image_preview(obj.svg_asset, 100)
 
 
 class UploadedFileInline(admin.TabularInline):
@@ -48,9 +64,18 @@ class AwaitingLogoAgeFilter(admin.SimpleListFilter):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'order', 'is_active')
+    list_display = ('name', 'card_image_thumb', 'slug', 'order', 'is_active')
+    readonly_fields = ('card_image_preview',)
     prepopulated_fields = {'slug': ('name',)}
     inlines = [TemplateGroupInline]
+
+    @admin.display(description='Card image')
+    def card_image_thumb(self, obj):
+        return _image_preview(obj.card_image, 60)
+
+    @admin.display(description='Card image preview')
+    def card_image_preview(self, obj):
+        return _image_preview(obj.card_image, 300)
 
 
 @admin.register(TemplateGroup)
@@ -63,10 +88,19 @@ class TemplateGroupAdmin(admin.ModelAdmin):
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
-    list_display = ('name', 'internal_number', 'group', 'order', 'is_active')
+    list_display = ('thumb', 'name', 'internal_number', 'group', 'order', 'is_active')
     list_editable = ('internal_number',)
     list_filter = ('group__product', 'group', 'is_active')
     prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ('svg_preview',)
+
+    @admin.display(description='Preview')
+    def thumb(self, obj):
+        return _image_preview(obj.svg_asset, 60)
+
+    @admin.display(description='Preview')
+    def svg_preview(self, obj):
+        return _image_preview(obj.svg_asset, 400)
 
 
 @admin.register(DesignRequest)
