@@ -88,15 +88,22 @@ class TemplateGroupAdmin(admin.ModelAdmin):
 
 @admin.register(Template)
 class TemplateAdmin(admin.ModelAdmin):
-    list_display = ('thumb', 'name', 'internal_number', 'group', 'order', 'is_active')
+    list_display = ('thumb', 'name', 'internal_number', 'product', 'group', 'order', 'is_active')
     list_editable = ('internal_number',)
     list_filter = ('group__product', 'group', 'is_active')
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ('svg_preview',)
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('group__product')
+
     @admin.display(description='Preview')
     def thumb(self, obj):
         return _image_preview(obj.svg_asset, 60)
+
+    @admin.display(description='Product', ordering='group__product')
+    def product(self, obj):
+        return obj.group.product
 
     @admin.display(description='Preview')
     def svg_preview(self, obj):
