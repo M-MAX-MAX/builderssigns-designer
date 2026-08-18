@@ -97,26 +97,30 @@
       {% endif %}
     {% endfor %}
 
-    <fieldset>
-      <div class="field">
-        {{ form.font_choice.label_tag }}
-        <div class="font-picker" data-picker>
-          <button type="button" class="font-picker-toggle" data-picker-toggle>Select a font</button>
-          <select name="font_choice" id="id_font_choice" hidden>
-            {% for f in font_options %}
-              <option value="{{ f.value }}" data-family="{{ f.family }}" data-weight="{{ f.weight }}"
-                {% if form.font_choice.value == f.value %}selected{% endif %}>{{ f.label }}</option>
-            {% endfor %}
-            <option value="other" {% if form.font_choice.value == 'other' %}selected{% endif %}>Can't find my font - type it below</option>
-          </select>
-          <div class="font-picker-list" data-picker-list hidden></div>
+    {% if template.group.field_schema %}
+      <fieldset>
+        <div class="field">
+          {{ form.font_choice.label_tag }}
+          <div class="font-picker" data-picker>
+            <button type="button" class="font-picker-toggle" data-picker-toggle>Select a font</button>
+            <select name="font_choice" id="id_font_choice" hidden>
+              {% for f in font_options %}
+                <option value="{{ f.value }}" data-family="{{ f.family }}" data-weight="{{ f.weight }}"
+                  {% if form.font_choice.value == f.value %}selected{% endif %}>{{ f.label }}</option>
+              {% endfor %}
+              <option value="other" {% if form.font_choice.value == 'other' %}selected{% endif %}>Can't find my font - type it below</option>
+            </select>
+            <div class="font-picker-list" data-picker-list hidden></div>
+          </div>
+          {{ form.font_choice.errors }}
         </div>
-        {{ form.font_choice.errors }}
-      </div>
-      <div class="field">
-        {{ form.font_custom_text.label_tag }}
-        {{ form.font_custom_text }}
-      </div>
+        <div class="field">
+          {{ form.font_custom_text.label_tag }}
+          {{ form.font_custom_text }}
+        </div>
+      </fieldset>
+    {% endif %}
+    <fieldset>
       <div class="field">
         {{ form.comments.label_tag }}
         {{ form.comments }}
